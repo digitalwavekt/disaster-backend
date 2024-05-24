@@ -1,0 +1,21 @@
+{
+  "name": "disaster-frontend",
+  "version": "1.0.0",
+  "description": "disaster management",
+  "main": "index.js",
+  "scripts": {
+    "test": "start npm"
+  },
+  "repository": {
+    "type": "git",
+    "url": "disaster-backend"
+  },
+  "keywords": [
+    "new"
+  ],
+  "author": "team-yogesh",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
