@@ -41,6 +41,7 @@ app.post("/signup" ,async (req, res) => {
     const data=(
         email:email,
         name :name,
+        phone:phone
         
         
     )
