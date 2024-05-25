@@ -40,7 +40,7 @@ app.post('/footprint', (req, res) => {
 
   // Convert Joules to a more user-friendly unit (e.g., kg CO2 equivalent)
   // You can implement conversion based on the conversion factor for CO2 (e.g., 4.184 J/cal and emission factor for fuel combustion)
-  const totalConsumption = totalJoules / /* conversion factor */; // Replace with actual conversion
+  const totalConsumption = totalJoules; //* conversion factor */ // Replace with actual conversion
 
   res.json({ message: 'Carbon footprint calculated successfully', totalConsumption });
 });

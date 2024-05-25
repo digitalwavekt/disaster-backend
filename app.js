@@ -1,73 +1,85 @@
 const express = require('express');
-const collection = require('./mongo');
-const cors = require('cors');
+const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt'); // For password hashing
+const mongoose = require('mongoose'); // For database storage
+
+// Replace with your actual MongoDB connection string
+const mongoURI = 'mongodb://localhost:27017/your_database_name';
+
 const app = express();
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-app.use(cors())
+app.use(bodyParser.json());
 
+// Mongoose schema for user data (consider adding validation)
+const UserSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true }, // Ensure email uniqueness
+  password: { type: String, required: true }
+});
 
-app.get('/',cors(), (req, res) => {
-})
+const User = mongoose.model('User', UserSchema);
 
-app.post("/" ,async (req, res) => {
-    const (mobile,otp ) = req.body
+// Connect to MongoDB database
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
-    try{
-        const check=await collection.findOne({mobile:mobile})
-        if(check){
-            if(check.otp===otp){
-                res.send("correct")
-            }
-            else{
-                res.send("incorrect")
-            }
-        }
-        else{
-            res.send("not registered")
+// Signup endpoint (POST request)
+app.post('/signup', async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
 
+    // Input validation (consider using a library like Joi)
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Missing required fields' });
     }
-catch(e){
-    res.json ("notexist")
 
-}
-
-})
-
-
-app.post("/signup" ,async (req, res) => {
-    const (mobile,otp ) = req.body
-
-    const data=(
-        email:email,
-        name :name,
-        phone:phone
-        
-        
-    )
-
-    try{
-        const check=await collection.findOne({mobile:mobile})
-        if(check){
-            if(check.otp===otp){
-                res.send("correct")
-            }
-            else{
-                res.send("incorrect")
-                await collection.insertMany([data])
-            }
-        }
-        else{
-            res.send("not registered")
-
+    // Check for existing user with the same email
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: 'Email already exists' }); // Conflict status
     }
-catch(e){
-    res.json ("notexist")
 
+    // Hash password securely before storing
+    const saltRounds = 10; // Adjust salt rounds as needed
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    const newUser = new User({ name, email, password: hashedPassword });
+    await newUser.save();
 
+    res.status(201).json({ message: 'User created successfully' });
+  } catch (err) {
+    console.error('Error creating user:', err);
+    res.status(500).json({ message: 'Error creating user' }); // Generic error for security
+  }
+});
 
-app.listen(5000, () => {
-    console.log("server started")
+// Login endpoint (POST request)
+app.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-})
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' }); // Unauthorized status
+    }
+
+    // Compare hashed passwords securely
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Login successful (avoid sending sensitive information like password in response)
+    res.json({ message: 'Login successful', user: { name: user.name, email: user.email } }); // Provide basic user details
+  } catch (err) {
+    console.error('Error logging in user:', err);
+    res.status(500).json({ message: 'Error logging in' }); // Generic error for security
+  }
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Server listening on port ${port}`));
