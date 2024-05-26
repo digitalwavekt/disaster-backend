@@ -4,17 +4,25 @@ mongoose.connect('mongodb://127.0.0.1:27017/DisasterManagement');
     console.log("mongodb connected");
 })
 .catch(()=>{
-    console
+    console.log("mongodb not connected");
 }
 )
 
 
 const newSchema = new mongoose.Schema({
-    mobile:(
+    name:(
         type:Number,
         required:true
-    )
-    otp:(
+    ),
+    email:(
+        type:Number,
+        required:true
+    ),
+    phone:(
+        type:Number,
+        required:true
+    ),
+    password:(
         type:Number,
         required:true
     )

@@ -13,6 +13,7 @@ app.use(bodyParser.json());
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true }, // Ensure email uniqueness
+  phone: { type: Number, required: true },
   password: { type: String, required: true }
 });
 
@@ -26,10 +27,10 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
 // Signup endpoint (POST request)
 app.post('/signup', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, phone , password } = req.body;
 
     // Input validation (consider using a library like Joi)
-    if (!name || !email || !password) {
+    if (!name || !email || !phone ||!password) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
