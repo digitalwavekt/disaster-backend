@@ -2,12 +2,18 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt'); // For password hashing
 const mongoose = require('mongoose'); // For database storage
+const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const your_secret_key = process.env.SECRET_KEY;
+
 
 // Replace with your actual MongoDB connection string
 const mongoURI = 'mongodb://localhost:27017/your_database_name';
 
 const app = express();
-app.use(bodyParser.json());
+const port = process.env.PORT || 3000; // Use environment variable for port
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL; 
+app.use(cors({ origin: 'https://github.com/cybercube10/CarboNfootprint' })); 
 
 // Mongoose schema for user data (consider adding validation)
 const UserSchema = new mongoose.Schema({
@@ -54,33 +60,42 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-// Login endpoint (POST request)
-app.post('/login', async (req, res) => {
-  try {
+
+
+// Hypothetical user data (replace with database integration)
+const users = [
+    {
+      email: 'test@gmail.com',
+      password: '$2y$10$JOvPQHf.XRuZVKVJwbXhOeOpLZLWuwsYWLfaN/.lnYWVWDNE2Ra4uO' // Hashed password for 'password123' (use bcrypt.hash to generate)
+    }
+  ];
+  
+  // Middleware for parsing incoming JSON data
+  app.use(express.json());
+  
+  // Login endpoint (POST request)
+  app.post('/login', async (req, res) => {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    const user = await User.findOne({ email });
+  
+    // Find user by email
+    const user = users.find((u) => u.email === email);
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' }); // Unauthorized status
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
-
-    // Compare hashed passwords securely
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+  
+    // Compare password hash (use bcrypt.compare to compare)
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
+  
+    // Generate JWT token with user ID (replace with actual user data)
+    const token = jwt.sign({ userId: user.email }, 'your_secret_key', { expiresIn: '30m' }); // Replace 'your_secret_key' with a strong secret key
+  
+    res.json({ token });
+  });
+  
+  // ... other API endpoints for your application
 
-    // Login successful (avoid sending sensitive information like password in response)
-    res.json({ message: 'Login successful', user: { name: user.name, email: user.email } }); // Provide basic user details
-  } catch (err) {
-    console.error('Error logging in user:', err);
-    res.status(500).json({ message: 'Error logging in' }); // Generic error for security
-  }
-});
-
-const port = process.env.PORT || 3000;
+export default LoginPage;
 app.listen(port, () => console.log(`Server listening on port ${port}`));

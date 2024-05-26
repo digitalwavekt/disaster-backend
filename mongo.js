@@ -1,32 +1,32 @@
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1:27017/DisasterManagement');
-.then(()=>{
-    console.log("mongodb connected");
-})
-.catch(()=>{
-    console.log("mongodb not connected");
+
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const uri = "mongodb+srv://contact2digitalwave:51377612@disastermanagement.j0nydzt.mongodb.net/?retryWrites=true&w=majority&appName=disastermanagement";
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+
+async function run() {
+  try {
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
 }
-)
+run().catch(console.dir);
 
 
-const newSchema = new mongoose.Schema({
-    name:(
-        type:Number,
-        required:true
-    ),
-    email:(
-        type:Number,
-        required:true
-    ),
-    phone:(
-        type:Number,
-        required:true
-    ),
-    password:(
-        type:Number,
-        required:true
-    )
-})
+const mongoose = require('mongoose');
 
 const collection = mongoose.model('collection',newSchema);
 
