@@ -16,20 +16,20 @@ const factors = {
 
 // API endpoint for calculating carbon footprint
 app.post('/footprint', (req, res) => {
-  const { acHours, refrigeratorLiters, fuelLiters, treesCut, woodKg, coalKg } = req.body;
+  const { acHours, refrigeratorHours, fuelLiters, treesCut, woodKg, coalKg } = req.body;
 
   // Input validation (consider using a library like Joi for more robust validation)
-  if (!acHours || !refrigeratorLiters || !fuelLiters || !treesCut || !woodKg || !coalKg) {
+  if (!acHours || !refrigeratorHours || !fuelLiters || !treesCut || !woodKg || !coalKg) {
     return res.status(400).json({ message: 'Missing required data' });
   }
 
-  if (acHours < 0 || refrigeratorLiters < 0 || fuelLiters < 0 || treesCut < 0 || woodKg < 0 || coalKg < 0) {
+  if (acHours < 0 || refrigeratorHours < 0 || fuelLiters < 0 || treesCut < 0 || woodKg < 0 || coalKg < 0) {
     return res.status(400).json({ message: 'Invalid input values (negative values not allowed)' });
   }
 
   // Calculate footprint components in Joules
   const acFootprint = acHours * factors.acUsagePerHour;
-  const refrigeratorFootprint = refrigeratorLiters * factors.refrigeratorUsagePerHour;
+  const refrigeratorFootprint = refrigeratorHours * factors.refrigeratorUsagePerHour;
   const fuelFootprint = fuelLiters * factors.fuelBurnPerLiter;
   const deforestationFootprint = treesCut * -factors.treeCarbonStorage; // Negative value as trees absorb CO2
   const woodBurningFootprint = woodKg * factors.woodBurningPerKg;
