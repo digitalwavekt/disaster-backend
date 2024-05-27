@@ -6,8 +6,6 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const your_secret_key = process.env.SECRET_KEY;
 
-
-// Hypothetical user data (replace with database integration)
 const users = [
     {
       email: 'test@gmail.com',

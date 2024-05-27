@@ -2,7 +2,7 @@
   "name": "disaster-frontend",
   "version": "1.0.0",
   "description": "disaster management",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "start npm"
   },
